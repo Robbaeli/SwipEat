@@ -21,3 +21,18 @@ export const searchRecipes = async (query: string): Promise<Recipe[]> => {
   // 5. data.meals.map(mapMealDbMealToRecipe)
   return data.meals.map(mapMealDbMealToRecipe);
 };
+export const getRecipeById = async (id: string): Promise<Recipe | null> => {
+  const url = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`;
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Something went wrong: ${response.status}`);
+  }
+
+  const data: MealDbSearchResponse = await response.json();
+  if (!data.meals) {
+    return null;
+  }
+
+  return mapMealDbMealToRecipe(data.meals[0]);
+};

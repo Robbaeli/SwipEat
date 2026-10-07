@@ -1,13 +1,52 @@
-import { dummyRecipes } from "@/data/dummy-recipes";
+import { getRecipeById } from "@/api/mealdb";
+import type { Recipe } from "@/types/recipes";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 export default function RecipeDetail() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const currentRecipe = dummyRecipes.find((recipe) => recipe.id === id);
 
+  const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadRecipe() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await getRecipeById(id as string);
+        setCurrentRecipe(result);
+      } catch (err) {
+        setError("could not fetch the recipe.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadRecipe();
+  }, [id]);
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" />;
+  }
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>{error}</Text>
+      </SafeAreaView>
+    );
+  }
   if (!currentRecipe) {
     return (
       <SafeAreaView style={styles.container}>
@@ -25,12 +64,7 @@ export default function RecipeDetail() {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Image
-          source={{
-            uri: currentRecipe.imageUrl,
-          }}
-          style={styles.image}
-        />
+        <Image source={{ uri: currentRecipe.imageUrl }} style={styles.image} />
         <Text style={styles.text}>{currentRecipe.name}</Text>
         <Text style={styles.text}>{currentRecipe.category}</Text>
 
