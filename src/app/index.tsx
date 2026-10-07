@@ -1,8 +1,11 @@
-import { dummyRecipes } from "@/data/dummy-recipes";
+import { searchRecipes } from "@/api/mealdb";
+import { useSavedRecipes } from "@/state/saved-recipes-context";
+import { Recipe } from "@/types/recipes";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Button,
   Pressable,
   SafeAreaView,
@@ -12,48 +15,81 @@ import {
 } from "react-native";
 export default function Index() {
   const router = useRouter();
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { saveRecipe } = useSavedRecipes();
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
-  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    async function loadRecipes() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await searchRecipes("chicken"); // sökord tillfälligt hårdkodat
+        setRecipes(result);
+      } catch (err) {
+        setError(
+          "Kunde inte hämta recept. Kontrollera din internetanslutning.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadRecipes();
+  }, []);
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" />;
+  }
+  if (error) {
+    return <Text>{error}</Text>;
+  }
+  if (recipes.length === 0) {
+    return <Text>Inga recept hittades</Text>;
+  }
+  const currentRecipe = recipes[currentRecipeIndex];
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.card}>
-        <Image
-          source={{
-            uri: dummyRecipes[currentRecipeIndex].imageUrl,
-          }}
-          style={styles.image}
-        />{" "}
-        <Text style={styles.text}>{dummyRecipes[currentRecipeIndex].name}</Text>
-        <Text style={styles.text}>
-          {dummyRecipes[currentRecipeIndex].category}
-        </Text>
-        <View>
-          <View style={styles.actionsRow}>
-            <Pressable
-              onPress={() => {
-                setLiked(false);
-                setCurrentRecipeIndex(
-                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
-                );
-              }}
-            >
-              <Text>❌</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setLiked(true);
-                setCurrentRecipeIndex(
-                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
-                );
-              }}
-            >
-              <Text>❤️</Text>
-            </Pressable>
+    <>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.card}>
+          <Image
+            source={{
+              uri: currentRecipe.imageUrl,
+            }}
+            style={styles.image}
+          />{" "}
+          <Text style={styles.text}>{currentRecipe.name}</Text>
+          <Text style={styles.text}>{currentRecipe.category}</Text>
+          <View>
+            <View style={styles.actionsRow}>
+              <Pressable
+                onPress={() => {
+                  setCurrentRecipeIndex(
+                    (prevIndex) => (prevIndex + 1) % recipes.length,
+                  );
+                }}
+              >
+                <Text>❌</Text>
+              </Pressable>
+
+              <Pressable
+                onPress={() => {
+                  saveRecipe(currentRecipe);
+                  setCurrentRecipeIndex(
+                    (prevIndex) => (prevIndex + 1) % recipes.length,
+                  );
+                }}
+              >
+                <Text>❤️</Text>
+              </Pressable>
+            </View>
           </View>
         </View>
-      </View>
-      <Button title="Saved recipes" onPress={() => router.push("/saved")} />
-    </SafeAreaView>
+        <Button title="Saved recipes" onPress={() => router.push("/saved")} />
+      </SafeAreaView>
+    </>
   );
 }
 
