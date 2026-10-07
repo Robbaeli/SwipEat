@@ -1,15 +1,20 @@
+import { dummyRecipes } from "@/data/dummy-recipes";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import {
-  Pressable,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 export default function RecipeDetail() {
   const router = useRouter();
+  const { id } = useLocalSearchParams();
+  const currentRecipe = dummyRecipes.find((recipe) => recipe.id === id);
+
+  if (!currentRecipe) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>didn't find the recipe</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -22,24 +27,22 @@ export default function RecipeDetail() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Image
           source={{
-            uri: "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+            uri: currentRecipe.imageUrl,
           }}
           style={styles.image}
         />
-        <Text style={styles.text}>name</Text>
-        <Text style={styles.text}>category</Text>
+        <Text style={styles.text}>{currentRecipe.name}</Text>
+        <Text style={styles.text}>{currentRecipe.category}</Text>
 
         <Text style={styles.heading}>Ingredients</Text>
-        <Text>• 400g Penne</Text>
-        <Text>• 2 garlic</Text>
-        <Text>• 1 can of crushed tomatoes</Text>
+        {currentRecipe.ingredients.map((ingredient, index) => (
+          <Text key={index}>
+            • {ingredient.name} ({ingredient.measure})
+          </Text>
+        ))}
 
         <Text style={styles.heading}>Instructions</Text>
-        <Text>
-          Keep it simple: cook the pasta according to the package instructions.
-          Sauté garlic in olive oil, add the crushed tomatoes, and simmer.
-          Combine with the cooked pasta and serve.
-        </Text>
+        <Text>{currentRecipe.instructions}</Text>
       </ScrollView>
     </SafeAreaView>
   );
