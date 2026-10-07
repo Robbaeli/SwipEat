@@ -1,5 +1,7 @@
+import { dummyRecipes } from "@/data/dummy-recipes";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useState } from "react";
 import {
   Button,
   Pressable,
@@ -8,26 +10,43 @@ import {
   Text,
   View,
 } from "react-native";
-
 export default function Index() {
   const router = useRouter();
+  const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
+  const [liked, setLiked] = useState(false);
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
         <Image
           source={{
-            uri: "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+            uri: dummyRecipes[currentRecipeIndex].imageUrl,
           }}
           style={styles.image}
         />{" "}
-        <Text style={styles.text}>name</Text>
-        <Text style={styles.text}>category</Text>
+        <Text style={styles.text}>{dummyRecipes[currentRecipeIndex].name}</Text>
+        <Text style={styles.text}>
+          {dummyRecipes[currentRecipeIndex].category}
+        </Text>
         <View>
           <View style={styles.actionsRow}>
-            <Pressable>
+            <Pressable
+              onPress={() => {
+                setLiked(false);
+                setCurrentRecipeIndex(
+                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+                );
+              }}
+            >
               <Text>❌</Text>
             </Pressable>
-            <Pressable>
+            <Pressable
+              onPress={() => {
+                setLiked(true);
+                setCurrentRecipeIndex(
+                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+                );
+              }}
+            >
               <Text>❤️</Text>
             </Pressable>
           </View>
