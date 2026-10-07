@@ -1,9 +1,11 @@
-import { dummyRecipes } from "@/data/dummy-recipes";
+import { searchRecipes } from "@/api/mealdb";
 import { useSavedRecipes } from "@/state/saved-recipes-context";
+import { Recipe } from "@/types/recipes";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  ActivityIndicator,
   Button,
   Pressable,
   SafeAreaView,
@@ -15,12 +17,41 @@ import {
 export default function Index() {
   const router = useRouter();
 
-  // State: vilket recept (index i listan) som visas just nu
-  const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { saveRecipe } = useSavedRecipes();
+  const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
 
-  // Hjälpvariabel: slipper skriva dummyRecipes[currentRecipeIndex] överallt
-  const currentRecipe = dummyRecipes[currentRecipeIndex];
+  useEffect(() => {
+    async function loadRecipes() {
+      try {
+        setIsLoading(true);
+        setError(null);
+        const result = await searchRecipes("chicken"); // sökord tillfälligt hårdkodat
+        setRecipes(result);
+      } catch (err) {
+        setError(
+          "Kunde inte hämta recept. Kontrollera din internetanslutning.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadRecipes();
+  }, []);
+
+  if (isLoading) {
+    return <ActivityIndicator size="large" />;
+  }
+  if (error) {
+    return <Text>{error}</Text>;
+  }
+  if (recipes.length === 0) {
+    return <Text>Inga recept hittades</Text>;
+  }
+
+  const currentRecipe = recipes[currentRecipeIndex];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -40,7 +71,7 @@ export default function Index() {
           <Pressable
             onPress={() => {
               setCurrentRecipeIndex(
-                (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+                (prevIndex) => (prevIndex + 1) % recipes.length,
               );
             }}
           >
@@ -50,7 +81,7 @@ export default function Index() {
             onPress={() => {
               saveRecipe(currentRecipe);
               setCurrentRecipeIndex(
-                (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+                (prevIndex) => (prevIndex + 1) % recipes.length,
               );
             }}
           >
