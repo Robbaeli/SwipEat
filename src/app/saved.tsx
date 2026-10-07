@@ -1,24 +1,29 @@
+import { useSavedRecipes } from "@/state/saved-recipes-context";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const dummySavedRecipes = [
-  {
-    id: "1",
-    name: "Spicy Arrabiata Penne",
-    imageUrl:
-      "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
-  },
-  {
-    id: "2",
-    name: "Teriyaki Chicken",
-    imageUrl:
-      "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
-  },
-];
+// const dummySavedRecipes = [
 export default function Saved() {
+  const { savedRecipes, removeRecipe } = useSavedRecipes();
   const router = useRouter();
+
+  //Dummyrecept for testing purposes
+  // {
+  //   id: "1",
+  //   name: "Spicy Arrabiata Penne",
+  //   imageUrl:
+  //     "https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg",
+  // },
+  // {
+  //   id: "2",
+  //   name: "Teriyaki Chicken",
+  //   imageUrl:
+  //     "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg",
+  // },
+  // ];
+  // export default function Saved() {
+  //   const router = useRouter();
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.backButton}>
@@ -28,13 +33,13 @@ export default function Saved() {
       </View>
 
       <Text style={styles.title}>Saved Recipes</Text>
-      {dummySavedRecipes.length === 0 ? (
+      {savedRecipes.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No saved recipes</Text>
         </View>
       ) : (
         <FlatList
-          data={dummySavedRecipes}
+          data={savedRecipes}
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.listContent}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -53,6 +58,7 @@ export default function Saved() {
                 accessibilityRole="button"
                 accessibilityLabel={`Delete ${item.name}`}
                 style={({ pressed }) => (pressed ? styles.pressed : undefined)}
+                onPress={() => removeRecipe(item.id)}
               >
                 <Text style={styles.deleteIcon}>🗑️</Text>
               </Pressable>

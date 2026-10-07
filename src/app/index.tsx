@@ -1,4 +1,5 @@
 import { dummyRecipes } from "@/data/dummy-recipes";
+import { useSavedRecipes } from "@/state/saved-recipes-context";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -10,48 +11,54 @@ import {
   Text,
   View,
 } from "react-native";
+
 export default function Index() {
   const router = useRouter();
+
+  // State: vilket recept (index i listan) som visas just nu
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
-  const [liked, setLiked] = useState(false);
+  const { saveRecipe } = useSavedRecipes();
+
+  // Hjälpvariabel: slipper skriva dummyRecipes[currentRecipeIndex] överallt
+  const currentRecipe = dummyRecipes[currentRecipeIndex];
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.card}>
-        <Image
-          source={{
-            uri: dummyRecipes[currentRecipeIndex].imageUrl,
-          }}
-          style={styles.image}
-        />{" "}
-        <Text style={styles.text}>{dummyRecipes[currentRecipeIndex].name}</Text>
-        <Text style={styles.text}>
-          {dummyRecipes[currentRecipeIndex].category}
-        </Text>
-        <View>
-          <View style={styles.actionsRow}>
-            <Pressable
-              onPress={() => {
-                setLiked(false);
-                setCurrentRecipeIndex(
-                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
-                );
-              }}
-            >
-              <Text>❌</Text>
-            </Pressable>
-            <Pressable
-              onPress={() => {
-                setLiked(true);
-                setCurrentRecipeIndex(
-                  (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
-                );
-              }}
-            >
-              <Text>❤️</Text>
-            </Pressable>
-          </View>
+        <Pressable
+          onPress={() => router.push(`/recipe-detail?id=${currentRecipe.id}`)}
+        >
+          <Image
+            source={{ uri: currentRecipe.imageUrl }}
+            style={styles.image}
+          />
+          <Text style={styles.text}>{currentRecipe.name}</Text>
+          <Text style={styles.text}>{currentRecipe.category}</Text>
+        </Pressable>
+
+        <View style={styles.actionsRow}>
+          <Pressable
+            onPress={() => {
+              setCurrentRecipeIndex(
+                (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+              );
+            }}
+          >
+            <Text>❌</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              saveRecipe(currentRecipe);
+              setCurrentRecipeIndex(
+                (prevIndex) => (prevIndex + 1) % dummyRecipes.length,
+              );
+            }}
+          >
+            <Text>❤️</Text>
+          </Pressable>
         </View>
       </View>
+
       <Button title="Saved recipes" onPress={() => router.push("/saved")} />
     </SafeAreaView>
   );
@@ -76,7 +83,7 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     marginBottom: 20,
-    backgroundColor: "#563b3b", // eller valfri färg
+    backgroundColor: "#563b3b",
     borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
