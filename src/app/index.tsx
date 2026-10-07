@@ -4,11 +4,12 @@ import { Recipe } from "@/types/recipes";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import {
   ActivityIndicator,
   Button,
   Pressable,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
