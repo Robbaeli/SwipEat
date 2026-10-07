@@ -13,8 +13,10 @@ import {
   Text,
   View,
 } from "react-native";
+
 export default function Index() {
   const router = useRouter();
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -48,48 +50,48 @@ export default function Index() {
   if (recipes.length === 0) {
     return <Text>Inga recept hittades</Text>;
   }
+
   const currentRecipe = recipes[currentRecipeIndex];
 
   return (
-    <>
-      <SafeAreaView style={styles.container}>
-        <View style={styles.card}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.card}>
+        <Pressable
+          onPress={() => router.push(`/recipe-detail?id=${currentRecipe.id}`)}
+        >
           <Image
-            source={{
-              uri: currentRecipe.imageUrl,
-            }}
+            source={{ uri: currentRecipe.imageUrl }}
             style={styles.image}
-          />{" "}
+          />
           <Text style={styles.text}>{currentRecipe.name}</Text>
           <Text style={styles.text}>{currentRecipe.category}</Text>
-          <View>
-            <View style={styles.actionsRow}>
-              <Pressable
-                onPress={() => {
-                  setCurrentRecipeIndex(
-                    (prevIndex) => (prevIndex + 1) % recipes.length,
-                  );
-                }}
-              >
-                <Text>❌</Text>
-              </Pressable>
+        </Pressable>
 
-              <Pressable
-                onPress={() => {
-                  saveRecipe(currentRecipe);
-                  setCurrentRecipeIndex(
-                    (prevIndex) => (prevIndex + 1) % recipes.length,
-                  );
-                }}
-              >
-                <Text>❤️</Text>
-              </Pressable>
-            </View>
-          </View>
+        <View style={styles.actionsRow}>
+          <Pressable
+            onPress={() => {
+              setCurrentRecipeIndex(
+                (prevIndex) => (prevIndex + 1) % recipes.length,
+              );
+            }}
+          >
+            <Text>❌</Text>
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              saveRecipe(currentRecipe);
+              setCurrentRecipeIndex(
+                (prevIndex) => (prevIndex + 1) % recipes.length,
+              );
+            }}
+          >
+            <Text>❤️</Text>
+          </Pressable>
         </View>
-        <Button title="Saved recipes" onPress={() => router.push("/saved")} />
-      </SafeAreaView>
-    </>
+      </View>
+
+      <Button title="Saved recipes" onPress={() => router.push("/saved")} />
+    </SafeAreaView>
   );
 }
 
@@ -112,7 +114,7 @@ const styles = StyleSheet.create({
   card: {
     alignItems: "center",
     marginBottom: 20,
-    backgroundColor: "#563b3b", // eller valfri färg
+    backgroundColor: "#563b3b",
     borderRadius: 16,
     padding: 16,
     shadowColor: "#000",
