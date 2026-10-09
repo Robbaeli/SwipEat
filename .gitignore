@@ -33,3 +33,5 @@ Thumbs.db
 
 expo-env.d.ts
 # @end expo-cli
+practice/01-map.js
+practice/02-filter.js
