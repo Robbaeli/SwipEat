@@ -1,11 +1,13 @@
-import { useSavedRecipes } from "@/state/saved-recipes-context";
+import { removeRecipe } from "@/state/saved-recipes-slice";
+import { useAppDispatch, useAppSelector } from "@/state/store";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 // const dummySavedRecipes = [
 export default function Saved() {
-  const { savedRecipes, removeRecipe } = useSavedRecipes();
+  const savedRecipes = useAppSelector((state) => state.savedRecipes.recipes);
+  const dispatch = useAppDispatch();
   const router = useRouter();
 
   //Dummyrecept for testing purposes
@@ -58,7 +60,7 @@ export default function Saved() {
                 accessibilityRole="button"
                 accessibilityLabel={`Delete ${item.name}`}
                 style={({ pressed }) => (pressed ? styles.pressed : undefined)}
-                onPress={() => removeRecipe(item.id)}
+                onPress={() => dispatch(removeRecipe(item.id))}
               >
                 <Text style={styles.deleteIcon}>🗑️</Text>
               </Pressable>

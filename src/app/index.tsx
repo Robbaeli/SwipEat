@@ -1,5 +1,6 @@
 import { searchRecipes } from "@/api/mealdb";
-import { useSavedRecipes } from "@/state/saved-recipes-context";
+import { addRecipe } from "@/state/saved-recipes-slice";
+import { useAppDispatch } from "@/state/store";
 import { Recipe } from "@/types/recipes";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
@@ -22,7 +23,7 @@ export default function Index() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { saveRecipe } = useSavedRecipes();
+  const dispatch = useAppDispatch();
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
 
   // searchQuery: vad användaren SKRIVER just nu i fältet (uppdateras varje tangenttryckning)
@@ -111,7 +112,7 @@ export default function Index() {
                 hitSlop={8}
                 style={[styles.actionButton, styles.saveButton]}
                 onPress={() => {
-                  saveRecipe(recipes[currentRecipeIndex]);
+                  dispatch(addRecipe(recipes[currentRecipeIndex]));
                   setCurrentRecipeIndex(
                     (prevIndex) => (prevIndex + 1) % recipes.length,
                   );
