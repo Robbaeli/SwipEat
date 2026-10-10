@@ -47,14 +47,24 @@ export default function Saved() {
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           renderItem={({ item }) => (
             <View style={styles.itemContainer}>
-              <Image
-                source={{ uri: item.imageUrl }}
-                style={styles.thumbnail}
-                contentFit="cover"
-              />
-              <Text style={styles.name} numberOfLines={2}>
-                {item.name}
-              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${item.name}`}
+                style={({ pressed }) => [
+                  styles.itemPressable,
+                  pressed && styles.pressed,
+                ]}
+                onPress={() => router.push(`/recipe-detail?id=${item.id}`)}
+              >
+                <Image
+                  source={{ uri: item.imageUrl }}
+                  style={styles.thumbnail}
+                  contentFit="cover"
+                />
+                <Text style={styles.name} numberOfLines={2}>
+                  {item.name}
+                </Text>
+              </Pressable>
               <Pressable
                 hitSlop={12}
                 accessibilityRole="button"
@@ -111,6 +121,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+  itemPressable: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   thumbnail: {
     width: 72,

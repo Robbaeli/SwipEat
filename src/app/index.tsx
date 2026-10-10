@@ -123,7 +123,10 @@ export default function Index() {
             </View>
           </View>
 
-          <Button title="Saved recipes" onPress={() => router.push("/saved")} />
+          <Button
+            title="Save to collection"
+            onPress={() => router.push("/saved")}
+          />
         </>
       )}
     </SafeAreaView>
