@@ -28,7 +28,7 @@ export default function Index() {
 
   // searchQuery: vad användaren SKRIVER just nu i fältet (uppdateras varje tangenttryckning)
   const [searchQuery, setSearchQuery] = useState("");
-  // submittedQuery: vad som faktiskt ska SÖKAS på (ändras bara när man trycker på knappen)
+  // submittedQuery: vad som ska SÖKAS på (ändras bara när man trycker på knappen)
   const [submittedQuery, setSubmittedQuery] = useState("");
 
   useEffect(() => {
@@ -123,10 +123,7 @@ export default function Index() {
             </View>
           </View>
 
-          <Button
-            title="Save to collection"
-            onPress={() => router.push("/saved")}
-          />
+          <Button title="Save to list" onPress={() => router.push("/saved")} />
         </>
       )}
     </SafeAreaView>
