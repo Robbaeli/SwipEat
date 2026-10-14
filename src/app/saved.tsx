@@ -10,7 +10,7 @@ export default function Saved() {
   const dispatch = useAppDispatch();
   const router = useRouter();
 
-  //Dummyrecept for testing purposes
+  //test recept dummy data
   // {
   //   id: "1",
   //   name: "Spicy Arrabiata Penne",
@@ -33,13 +33,14 @@ export default function Saved() {
           <Text>← back</Text>
         </Pressable>
       </View>
-
+      {/* Empty recepies */}
       <Text style={styles.title}>Saved Recipes</Text>
       {savedRecipes.length === 0 ? (
         <View style={styles.emptyState}>
           <Text style={styles.emptyText}>No saved recipes</Text>
         </View>
       ) : (
+        /* Fllatlist with saved recepies */
         <FlatList
           data={savedRecipes}
           keyExtractor={(item) => item.id}
